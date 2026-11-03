@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Demo · Funnel de reclutamiento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2EFE6;--paper2:#E8E3D4;--ink:#0A0A0A;--ink2:#4A4A4A;--ink3:#888;
+  --accent:#FF3D00;--blue:#1740E6;--mute1:#D9D3C0;--mute2:#A8A395;--ok:#1F7A4A;--warn:#E69500;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --disp:'Space Grotesk',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--mono);font-size:13px;line-height:1.45;letter-spacing:.01em;
+  background-image:linear-gradient(rgba(0,0,0,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.06) 1px,transparent 1px);background-size:24px 24px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px 48px}
+.kicker{text-transform:uppercase;letter-spacing:.18em;font-size:11px;color:var(--ink2)}
+.lt{background:var(--ink);color:var(--paper);font-size:10px;text-transform:uppercase;letter-spacing:.1em;padding:2px 7px;display:inline-block}
+.acc{color:var(--accent)}
+/* header */
+header{display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:2px solid var(--ink)}
+.brand{font-family:var(--disp);font-size:22px;letter-spacing:-.03em}
+.brand b{color:var(--accent);font-weight:500}
+.strip{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:10px 0;border-bottom:2px solid var(--ink);font-size:11px;text-transform:uppercase;letter-spacing:.12em}
+.strip .m{color:var(--ink3)}
+.dot{color:var(--accent)}
+h1{font-family:var(--disp);font-weight:500;font-size:clamp(34px,5.2vw,64px);line-height:.98;letter-spacing:-.04em;margin:36px 0 12px}
+.lead{font-size:15px;color:var(--ink2);max-width:760px;line-height:1.6}
+.sim{margin:20px 0 24px;border:2px solid var(--accent);padding:10px 14px;display:flex;gap:10px;align-items:flex-start;font-size:12px}
+.sim .dot{flex:none}
+/* layout */
+.main{display:grid;grid-template-columns:260px 1fr;border:2px solid var(--ink);background:var(--paper)}
+.side{border-right:2px solid var(--ink);display:flex;flex-direction:column}
+.phead{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;border-bottom:2px solid var(--ink);font-size:11px;text-transform:uppercase;letter-spacing:.14em}
+.phead .r{color:var(--accent)}
+.steps{list-style:none;flex:1}
+.steps li{display:flex;gap:10px;padding:11px 14px;border-bottom:1.5px solid var(--ink);cursor:pointer;transition:background .15s ease;font-size:12px;position:relative}
+.steps li:last-child{border-bottom:0}
+.steps li:hover{background:var(--paper2)}
+.steps li .n{color:var(--ink3);flex:none;width:28px}
+.steps li.done .n{color:var(--ok)}
+.steps li.cur{background:var(--ink);color:var(--paper)}
+.steps li.cur .n{color:var(--accent)}
+.steps li .pb{position:absolute;left:0;bottom:0;height:3px;background:var(--accent);width:0}
+.stage{display:flex;flex-direction:column;min-width:0}
+.scene{padding:24px 28px;min-height:420px;position:relative;background:var(--paper2);
+  background-image:linear-gradient(rgba(0,0,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.04) 1px,transparent 1px);background-size:20px 20px}
+.stitle{font-family:var(--disp);font-weight:500;font-size:clamp(22px,3vw,32px);letter-spacing:-.03em;line-height:1.1;margin:6px 0 8px}
+.sdesc{color:var(--ink2);font-size:13px;line-height:1.6;max-width:720px;margin-bottom:18px}
+.canvas{position:relative}
+/* reveal */
+.rv{opacity:0;transform:translateY(6px);transition:opacity .35s ease,transform .35s ease}
+.rv.on{opacity:1;transform:none}
+.cd{background:var(--paper);border:2px solid var(--ink)}
+.cd .ch{padding:7px 12px;border-bottom:2px solid var(--ink);font-size:10px;text-transform:uppercase;letter-spacing:.14em;display:flex;justify-content:space-between;gap:8px}
+.cd .ch.ac{background:var(--accent);color:var(--paper)}
+.cd .cb{padding:12px 14px}
+.row{display:flex;gap:10px;justify-content:space-between;padding:6px 0;border-bottom:1.5px solid var(--mute1);font-size:12px;align-items:center}
+.row:last-child{border-bottom:0}
+.row .k{color:var(--ink3);text-transform:uppercase;letter-spacing:.1em;font-size:10px;flex:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.chip{display:inline-block;border:1.5px solid var(--ink);padding:1px 7px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;white-space:nowrap;background:var(--paper)}
+.chip.ok{border-color:var(--ok);color:var(--ok)}
+.chip.wr{border-color:var(--warn);color:#9a6400}
+.chip.ac{border-color:var(--accent);color:var(--accent)}
+.chip.bl{border-color:var(--blue);color:var(--blue)}
+.chip.k{background:var(--ink);color:var(--paper)}
+.cursor::after{content:"▌";color:var(--accent);animation:bl 1s steps(1) infinite}
+@keyframes bl{50%{opacity:0}}
+.ad{white-space:pre-wrap;font-size:12px;line-height:1.6;min-height:200px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);font-weight:500;padding:6px 10px;border-bottom:2px solid var(--ink)}
+td{padding:7px 10px;border-bottom:1.5px solid var(--mute1);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+.bar{height:10px;border:1.5px solid var(--ink);background:var(--paper);position:relative;min-width:80px}
+.bar i{display:block;height:100%;background:var(--ink);width:0;transition:width .9s ease}
+.bar i.hi{background:var(--accent)}
+.rv.on .bar i{width:var(--w)}
+.thr{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--accent)}
+.btn{font:inherit;font-size:11px;text-transform:uppercase;letter-spacing:.12em;border:2px solid var(--ink);background:var(--paper);color:var(--ink);padding:7px 12px;cursor:pointer;transition:all .15s ease}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.btn.pri{background:var(--ink);color:var(--paper)}
+.btn.pri:hover{background:var(--accent);border-color:var(--accent)}
+.btn.sel{background:var(--ink);color:var(--paper)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.fake{pointer-events:none}
+.stk{display:grid}
+.stk>*{grid-area:1/1;justify-self:start;align-self:center}
+.fake.press{background:var(--ink);color:var(--paper)}
+/* controls + log */
+.ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 14px;border-top:2px solid var(--ink);background:var(--paper)}
+.ctl .sp{flex:1}
+.prog{height:4px;background:var(--mute1);flex:1;min-width:80px;position:relative}
+.prog i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);width:0}
+.log{border-top:2px solid var(--ink);background:var(--ink);color:var(--paper);height:150px;overflow:auto;padding:10px 14px;font-size:11.5px;line-height:1.7}
+.log .ln{display:none;white-space:pre-wrap}
+.log .ln.on{display:block}
+.log .t{color:var(--mute2)}
+.log .g{color:var(--accent)}
+.foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 0;margin-top:24px;border-top:2px solid var(--ink);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink2)}
+/* flow */
+.flow{display:flex;align-items:center;gap:0;flex-wrap:wrap;margin-bottom:16px}
+.nd{border:2px solid var(--ink);background:var(--paper);padding:6px 10px;font-size:11px;text-transform:uppercase;letter-spacing:.1em}
+.nd.on{background:var(--ink);color:var(--paper)}
+.ar{width:22px;height:2px;background:var(--ink);position:relative}
+.ar::after{content:"";position:absolute;right:-1px;top:-4px;border:5px solid transparent;border-left:7px solid var(--ink);border-right:0}
+.mail{background:var(--paper);border:2px solid var(--ink)}
+.mail .mh{padding:8px 14px;border-bottom:1.5px solid var(--ink);font-size:11px;color:var(--ink2);line-height:1.7}
+.mail .mb{padding:12px 14px;font-size:12px;line-height:1.7}
+.mail .mf{padding:8px 14px;border-top:1.5px solid var(--mute1);font-size:10px;color:var(--ink3)}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid var(--ink);background:var(--paper)}
+.kpi>div{padding:12px 14px;border-right:1.5px solid var(--ink)}
+.kpi>div:last-child{border-right:0}
+.kpi .v{font-family:var(--disp);font-size:30px;letter-spacing:-.04em;line-height:1}
+.kpi .l{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink2);margin-top:6px}
+.cl{list-style:none}
+.cl li{display:flex;gap:8px;padding:5px 0;border-bottom:1.5px solid var(--mute1);font-size:12px}
+.cl li:last-child{border-bottom:0}
+.cl .bx{width:14px;height:14px;border:1.5px solid var(--ink);flex:none;margin-top:2px;text-align:center;line-height:11px;font-size:11px;color:var(--paper)}
+.cl li.ck .bx{background:var(--ok);border-color:var(--ok)}
+@media (max-width:900px){
+  .main{grid-template-columns:1fr}
+  .side{border-right:0;border-bottom:2px solid var(--ink)}
+  .steps{display:grid;grid-template-columns:repeat(4,1fr)}
+  .steps li{border-bottom:1.5px solid var(--ink);border-right:1.5px solid var(--ink);flex-direction:column;gap:2px;padding:8px}
+  .steps li .tx{display:none}
+  .steps li.cur .tx{display:none}
+  .grid2,.grid3{grid-template-columns:1fr}
+  .kpi{grid-template-columns:1fr 1fr}
+  .kpi>div{border-bottom:1.5px solid var(--ink)}
+  .wrap{padding:0 16px 32px}
+  .scene{padding:18px 14px}
+  table{font-size:11px}
+  td,th{padding:6px 5px}
+  .hm{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">ai—q.fit<b>/</b></div>
+    <span class="lt">Demo · simulación</span>
+  </header>
+  <div class="strip">
+    <span>DOC // AIQ-DEMO-001 <span class="m">· REV / A</span></span>
+    <span><span class="dot">●</span> Datos ficticios <span class="m">· HOJA 01 / FLUJO</span></span>
+  </div>
+
+  <div class="kicker" style="margin-top:36px">§ Funnel de reclutamiento · recorrido de una búsqueda</div>
+  <h1>De la vacante al alta, <span class="acc">sin copiar y pegar/</span></h1>
+  <p class="lead">Una búsqueda de principio a fin, en menos de dos minutos: el orquestador detecta la vacante en el sistema de RR.HH., el LLM redacta y evalúa, las personas deciden, y todo queda registrado en una sola base.</p>
+
+  <div class="sim"><span class="dot">●</span><span><b>Simulación ilustrativa.</b> Los nombres, cifras y mensajes son ficticios y no hay conexión con sistemas reales. Sirve para mostrar el flujo y los puntos donde una persona decide.</span></div>
+
+  <div class="main">
+    <aside class="side">
+      <div class="phead"><span>Etapas</span><span class="r" id="stepcount">01 / 08</span></div>
+      <ol class="steps" id="steps"></ol>
+    </aside>
+    <section class="stage">
+      <div class="phead"><span id="phtitle">FIG. 01 · Vacante</span><span class="r" id="clock">00:00</span></div>
+      <div class="scene">
+        <div class="kicker" id="skick"></div>
+        <h2 class="stitle" id="stitle"></h2>
+        <p class="sdesc" id="sdesc"></p>
+        <div class="flow" id="flow"></div>
+        <div class="canvas" id="canvas"></div>
+      </div>
+      <div class="ctl">
+        <button class="btn" id="bPrev" aria-label="Etapa anterior">←</button>
+        <button class="btn pri" id="bPlay" aria-label="Reproducir o pausar">❚❚ Pausa</button>
+        <button class="btn" id="bNext" aria-label="Etapa siguiente">→</button>
+        <button class="btn" id="bRestart">Reiniciar</button>
+        <div class="prog"><i id="gprog"></i></div>
+        <button class="btn" id="bSpeed" aria-label="Velocidad">1x</button>
+      </div>
+      <div class="log" id="log" aria-live="off"></div>
+    </section>
+  </div>
+
+  <div class="foot"><span>Orquestador · LLM · sistema de RR.HH.</span><span>Atajos: espacio = pausa · ← → = etapas</span></div>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const FLOW=["Sistema RR.HH.","Orquestador","LLM","Portales","Correo","Persona"];
+
+/* ---------- escenas ---------- */
+const S=[];
+
+S.push({
+ ph:"FIG. 01 · Vacante",kick:"§01 · Detección",title:"Una vacante aprobada dispara el flujo",
+ desc:"El sistema de RR.HH. es la fuente de verdad. El orquestador consulta su API cada pocos minutos, compara contra su propia base y detecta lo nuevo: no depende de webhooks.",
+ dur:9000,flow:[0,1],
+ html:`<div class="grid2">
+  <div class="cd rv" data-at="300"><div class="ch"><span>Sistema RR.HH. · Vacante</span><span class="acc">Aprobada</span></div><div class="cb">
+   <div class="row"><span class="k">Cargo</span><span>Ejecutivo/a de atención</span></div>
+   <div class="row"><span class="k">Sucursal</span><span>Concepción</span></div>
+   <div class="row"><span class="k">Vacantes</span><span>3</span></div>
+   <div class="row"><span class="k">Jornada</span><span>Completa</span></div>
+   <div class="row"><span class="k">Aprobó</span><span>Jefatura de zona</span></div>
+  </div></div>
+  <div class="cd rv" data-at="2600"><div class="ch"><span>Orquestador · consulta periódica</span><span>Cada 10 min</span></div><div class="cb">
+   <div class="row"><span class="k">Última marca</span><span>09:50:00</span></div>
+   <div class="row"><span class="k">Consulta</span><span>09:59:58</span></div>
+   <div class="row rv" data-at="4200"><span class="k">Diferencia</span><span class="chip ac">1 vacante nueva</span></div>
+   <div class="row rv" data-at="5600"><span class="k">Acción</span><span class="chip k">Iniciar búsqueda BUS-0417</span></div>
+   <div class="row rv" data-at="6800"><span class="k">Registro</span><span class="chip ok">Guardado en base única</span></div>
+  </div></div></div>`,
+ log:[[400,"RR.HH","vacante aprobada · Ejecutivo/a de atención · Concepción"],[3200,"ORQ","consulta periódica · comparando contra base propia"],[4300,"ORQ","1 vacante nueva detectada"],[5700,"ORQ","búsqueda BUS-0417 creada"]]
+});
+
+S.push({
+ ph:"FIG. 02 · Aviso",kick:"§02 · Redacción",title:"El LLM redacta el aviso y define la rúbrica",
+ desc:"A partir del perfil del cargo, el LLM propone el texto del aviso y los criterios con los que se evaluarán las postulaciones. Una persona de RR.HH. aprueba antes de publicar.",
+ dur:11000,flow:[1,2],
+ html:`<div class="grid2">
+  <div class="cd rv" data-at="200"><div class="ch"><span>Borrador de aviso · LLM</span><span class="acc">Pendiente de aprobación</span></div><div class="cb">
+   <div class="ad cursor" data-tw="Ejecutivo/a de atención · Concepción
+
+Buscamos 3 personas para atender socios y socias en nuestra sucursal, resolviendo consultas y trámites con claridad y buen trato.
+
+Requisitos
+· Enseñanza media completa (técnico deseable)
+· 1 año de experiencia en atención presencial
+· Manejo de herramientas de oficina
+
+Ofrecemos jornada completa y capacitación inicial.
+Postula en el enlace de este aviso." data-at="700" data-dur="5200"></div>
+  </div></div>
+  <div style="display:flex;flex-direction:column;gap:16px">
+   <div class="cd rv" data-at="6200"><div class="ch"><span>Rúbrica de evaluación</span><span>Total 100</span></div><div class="cb">
+    <div class="row"><span>Experiencia en atención</span><span class="chip">40</span></div>
+    <div class="row"><span>Formación</span><span class="chip">25</span></div>
+    <div class="row"><span>Herramientas de oficina</span><span class="chip">20</span></div>
+    <div class="row"><span>Disponibilidad y zona</span><span class="chip">15</span></div>
+   </div></div>
+   <div class="cd rv" data-at="8000"><div class="ch"><span>Aprobación</span><span>Persona</span></div><div class="cb" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+    <span style="font-size:12px">Analista de selección revisa texto y rúbrica</span>
+    <span class="chip ok rv" data-at="9400">Aprobado</span></div></div>
+  </div></div>`,
+ log:[[800,"LLM","redactando aviso desde el perfil del cargo"],[6200,"LLM","rúbrica propuesta · 4 criterios"],[9400,"RR.HH","aviso y rúbrica aprobados por analista"]]
+});
+
+S.push({
+ ph:"FIG. 03 · Publicación",kick:"§03 · Publicación",title:"Cada portal, por la vía que permite",
+ desc:"Donde hay integración, se publica solo. Donde el portal solo tiene panel, el orquestador deja el aviso listo, la persona lo publica en minutos y el sistema registra el enlace.",
+ dur:12000,flow:[1,3],
+ html:`<div class="cd rv" data-at="200"><div class="ch"><span>Aviso BUS-0417 · estado por portal</span><span>5 portales</span></div>
+  <table><thead><tr><th>Portal</th><th>Vía</th><th>Estado</th></tr></thead><tbody>
+   <tr><td>Portal A</td><td><span class="chip bl">Automática</span></td><td class="stk"><span class="chip wr rv" data-at="800" data-until="2200">Publicando</span><span class="chip ok rv" data-at="2200">Publicado</span></td></tr>
+   <tr><td>Portal B</td><td><span class="chip bl">Vía socio ATS</span></td><td class="stk"><span class="chip wr rv" data-at="1400" data-until="3200">Publicando</span><span class="chip ok rv" data-at="3200">Publicado</span></td></tr>
+   <tr><td>Portal C</td><td><span class="chip">Contrato</span></td><td class="stk"><span class="chip wr rv" data-at="2000" data-until="4200">Publicando</span><span class="chip ok rv" data-at="4200">Publicado</span></td></tr>
+   <tr><td>Portal D</td><td><span class="chip">Contrato</span></td><td class="stk"><span class="chip wr rv" data-at="2600" data-until="5000">Publicando</span><span class="chip ok rv" data-at="5000">Publicado</span></td></tr>
+   <tr><td>Portal E <span class="m" style="color:var(--ink3)">(solo panel)</span></td><td><span class="chip ac">Asistida</span></td><td class="stk"><span class="chip wr rv" data-at="3200" data-until="8800">Tarea para una persona</span><span class="chip ok rv" data-at="8800">Publicado · enlace registrado</span></td></tr>
+  </tbody></table></div>
+  <div class="cd rv" data-at="5600" style="margin-top:16px"><div class="ch ac"><span>Tarea asistida · Portal E</span><span>~6 min</span></div><div class="cb" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:space-between">
+   <span style="font-size:12px">Aviso adaptado al formato del portal, listo para pegar.</span>
+   <span style="display:flex;gap:8px"><span class="btn fake rv" data-at="6200">Copiar aviso</span><span class="btn pri fake rv" data-at="7600">Marcar publicado</span></span>
+  </div></div>`,
+ log:[[900,"ORQ","publicando en portales con integración"],[3300,"ORQ","Portal E sin API · tarea asistida creada"],[6300,"PERS","aviso copiado desde el orquestador"],[8800,"ORQ","enlace de Portal E registrado · etiqueta de origen asignada"]]
+});
+
+S.push({
+ ph:"FIG. 04 · Captura",kick:"§04 · Captura",title:"Las postulaciones llegan de varias vías",
+ desc:"El camino principal es el enlace propio de cada aviso. Donde la postulación ocurre dentro del portal, se capta por API, por el correo de notificación o por exportación periódica. Cada registro lleva su origen.",
+ dur:12000,flow:[3,1],
+ html:`<div class="cd"><div class="ch"><span>Postulaciones entrantes · BUS-0417</span><span id="cnt1" class="acc">0 recibidas</span></div>
+ <table><thead><tr><th>Candidato/a</th><th>Origen</th><th class="hm">Portal</th><th>RUT</th></tr></thead><tbody>
+  <tr class="rv" data-at="800"><td>Camila R.</td><td><span class="chip bl">Enlace propio</span></td><td class="hm">Portal A</td><td>1X.XXX.XXX-X</td></tr>
+  <tr class="rv" data-at="2000"><td>Matías S.</td><td><span class="chip bl">Enlace propio</span></td><td class="hm">Portal B</td><td>1X.XXX.XXX-X</td></tr>
+  <tr class="rv" data-at="3200"><td>Camila R.</td><td><span class="chip wr">Correo de notificación</span></td><td class="hm">Portal C</td><td><span style="color:var(--ink3)">— sin RUT</span></td></tr>
+  <tr class="rv" data-at="4400"><td>Javiera P.</td><td><span class="chip">API / ATS</span></td><td class="hm">Portal A</td><td>1X.XXX.XXX-X</td></tr>
+  <tr class="rv" data-at="5600"><td>Diego F.</td><td><span class="chip wr">Correo de notificación</span></td><td class="hm">Portal D</td><td><span style="color:var(--ink3)">— sin RUT</span></td></tr>
+  <tr class="rv" data-at="6800"><td>Valentina C.</td><td><span class="chip">Exportación diaria</span></td><td class="hm">Portal E</td><td>1X.XXX.XXX-X</td></tr>
+  <tr class="rv" data-at="8000"><td>Tomás A.</td><td><span class="chip bl">Enlace propio</span></td><td class="hm">Portal E</td><td>1X.XXX.XXX-X</td></tr>
+ </tbody></table></div>
+ <p class="rv" data-at="9400" style="margin-top:12px;font-size:12px;color:var(--ink2)"><span class="dot">●</span> Si un portal cambia su pantalla, solo se ven afectadas las vías por correo y por panel; el enlace propio y las API no dependen de ella. El orquestador alerta cuando una vía deja de recibir registros.</p>`,
+ count:{id:"cnt1",steps:[800,2000,3200,4400,5600,6800,8000],label:" recibidas"},
+ log:[[900,"ORQ","registro 1 · origen ENLACE_PROPIO"],[3300,"ORQ","registro 3 · origen CORREO_NOTIF · RUT no informado"],[4500,"ORQ","registro 4 · origen API"],[8100,"ORQ","7 registros · 4 vías de captura"],[9500,"ORQ","monitor de vías · sin alertas"]]
+});
+
+S.push({
+ ph:"FIG. 05 · Duplicados",kick:"§05 · Candidato único",title:"Una persona, un registro, aunque no haya RUT",
+ desc:"Si coinciden claves exactas (RUT validado, correo o teléfono normalizado, huella del archivo), se unifica sola. Si solo hay parecido de nombre y trayectoria, el LLM lo explica y una persona confirma.",
+ dur:12000,flow:[1,2,5],
+ html:`<div class="grid3">
+  <div class="cd rv" data-at="300"><div class="ch"><span>Registro 1</span><span>Enlace propio</span></div><div class="cb">
+   <div class="row"><span class="k">Nombre</span><span>Camila R.</span></div>
+   <div class="row"><span class="k">RUT</span><span>1X.XXX.XXX-X</span></div>
+   <div class="row"><span class="k">Correo</span><span>c.r****@mail.cl</span></div>
+   <div class="row"><span class="k">Teléfono</span><span>+56 9 ****</span></div>
+   <div class="row"><span class="k">Ciudad</span><span>Concepción</span></div></div></div>
+  <div class="cd rv" data-at="1400"><div class="ch"><span>Registro 3</span><span>Correo de notif.</span></div><div class="cb">
+   <div class="row"><span class="k">Nombre</span><span>Camila R.</span></div>
+   <div class="row"><span class="k">RUT</span><span style="color:var(--ink3)">sin dato</span></div>
+   <div class="row"><span class="k">Correo</span><span>c.r****@mail.cl</span></div>
+   <div class="row"><span class="k">Teléfono</span><span>+56 9 ****</span></div>
+   <div class="row"><span class="k">Ciudad</span><span>Concepción</span></div></div></div>
+  <div class="cd rv" data-at="3200"><div class="ch ac"><span>Posible duplicado</span><span>Confianza alta</span></div><div class="cb" style="font-size:12px;line-height:1.6">
+   <div class="rv" data-at="3800"><span class="chip ok">Coincide</span> correo normalizado</div>
+   <div class="rv" data-at="4400" style="margin-top:6px"><span class="chip ok">Coincide</span> teléfono, ciudad, nombre</div>
+   <div class="rv" data-at="5200" style="margin-top:6px"><span class="chip wr">Falta</span> RUT en el registro 3</div>
+   <p class="rv" data-at="6000" style="margin-top:10px;color:var(--ink2)">Explicación del LLM: mismos medios de contacto y misma ciudad; el segundo registro no informa RUT.</p>
+   <div class="rv" data-at="7200" style="margin-top:12px;display:flex;gap:8px"><span class="btn fake" id="bUn">Unificar</span><span class="btn fake">No son la misma</span></div></div></div>
+ </div>
+ <div class="cd rv" data-at="8600" style="margin-top:16px"><div class="ch"><span>Resultado en la base única</span><span class="acc">Decide una persona</span></div><div class="cb" style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px">
+  <span><span class="chip k">1 candidata</span> &nbsp;con <span class="chip">2 postulaciones</span> &nbsp;origen conservado en cada una</span>
+  <span class="chip ok">RUT se valida en el primer correo</span></div></div>`,
+ press:{sel:"#bUn",at:8000},
+ log:[[3300,"ORQ","regla exacta no aplica (sin RUT) · evaluando similitud"],[6000,"LLM","explicación generada · 3 coincidencias, 1 dato faltante"],[8100,"PERS","analista confirma · unificar"],[8700,"ORQ","candidata única · 2 postulaciones asociadas"]]
+});
+
+S.push({
+ ph:"FIG. 06 · Evaluación",kick:"§06 · Preselección",title:"El LLM ordena; la persona decide",
+ desc:"Cada postulación se compara contra la rúbrica aprobada y queda con puntaje y motivos. Ninguna persona es descartada solo por el sistema: RR.HH. revisa y confirma quién avanza.",
+ dur:12000,flow:[2,5],
+ html:`<div class="cd"><div class="ch"><span>Puntaje contra rúbrica · 6 candidatos/as</span><span>Umbral de revisión 70</span></div>
+ <table><thead><tr><th>Candidato/a</th><th style="width:34%">Puntaje</th><th class="hm">Motivo principal</th><th>Decisión</th></tr></thead><tbody>
+  <tr class="rv" data-at="600"><td>Camila R.</td><td><div class="bar"><i class="hi" style="--w:92%"></i><span class="thr" style="left:70%"></span></div></td><td class="hm">3 años en atención presencial</td><td><span class="chip ok rv" data-at="7600">Avanza</span></td></tr>
+  <tr class="rv" data-at="1400"><td>Javiera P.</td><td><div class="bar"><i class="hi" style="--w:86%"></i><span class="thr" style="left:70%"></span></div></td><td class="hm">Técnico + 2 años en caja</td><td><span class="chip ok rv" data-at="8200">Avanza</span></td></tr>
+  <tr class="rv" data-at="2200"><td>Matías S.</td><td><div class="bar"><i class="hi" style="--w:78%"></i><span class="thr" style="left:70%"></span></div></td><td class="hm">1 año en atención telefónica</td><td><span class="chip ok rv" data-at="8800">Avanza</span></td></tr>
+  <tr class="rv" data-at="3000"><td>Valentina C.</td><td><div class="bar"><i style="--w:66%"></i><span class="thr" style="left:70%"></span></div></td><td class="hm">Sin experiencia presencial</td><td><span class="chip wr rv" data-at="9400">En revisión</span></td></tr>
+  <tr class="rv" data-at="3800"><td>Tomás A.</td><td><div class="bar"><i style="--w:58%"></i><span class="thr" style="left:70%"></span></div></td><td class="hm">Disponibilidad parcial</td><td><span class="chip wr rv" data-at="9400">En revisión</span></td></tr>
+  <tr class="rv" data-at="4600"><td>Diego F.</td><td><div class="bar"><i style="--w:44%"></i><span class="thr" style="left:70%"></span></div></td><td class="hm">Otra ciudad</td><td><span class="chip wr rv" data-at="9400">En revisión</span></td></tr>
+ </tbody></table></div>
+ <p class="rv" data-at="10200" style="margin-top:12px;font-size:12px;color:var(--ink2)"><span class="dot">●</span> Quienes quedan bajo el umbral los revisa una persona antes de cualquier respuesta. Los criterios y motivos quedan guardados para revisión posterior.</p>`,
+ log:[[700,"LLM","evaluando postulaciones contra rúbrica aprobada"],[5000,"LLM","6 evaluaciones con puntaje y motivos"],[7600,"PERS","analista confirma 3 candidatos/as"],[9400,"PERS","3 casos bajo umbral · revisión manual"]]
+});
+
+S.push({
+ ph:"FIG. 07 · Correo",kick:"§07 · Seguimiento por correo",title:"Todo por correo, con pausa cuando la persona responde",
+ desc:"Un remitente transaccional, un enlace seguro para subir documentos y una secuencia que se detiene sola al detectar una respuesta. Sin otros canales.",
+ dur:12000,flow:[1,4,5],
+ html:`<div class="grid2">
+  <div class="mail rv" data-at="300">
+   <div class="mh"><b>De:</b> Selección · cooperativa<br><b>Para:</b> c.r****@mail.cl<br><b>Asunto:</b> Avanzaste en el proceso · Ejecutivo/a de atención</div>
+   <div class="mb">Hola Camila,<br><br>Tu postulación avanza a entrevista. Para continuar necesitamos:<br>
+    · Confirmar tu RUT (en el enlace seguro)<br>· Subir tu CV actualizado<br><br>
+    <span class="chip k">Subir documentos</span><br><br>Puedes elegir un horario de entrevista en el mismo enlace.</div>
+   <div class="mf">Recibes este correo por tu postulación. Dejar de recibir correos · Ejercer mis derechos sobre mis datos</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:16px">
+   <div class="cd rv" data-at="1800"><div class="ch"><span>Secuencia de seguimiento</span><span>Automática</span></div><div class="cb">
+    <div class="row"><span>Correo 1 · día 0</span><span class="chip ok">Enviado</span></div>
+    <div class="row"><span>Recordatorio · día 2</span><span class="chip rv" data-at="1800" data-until="5400">Programado</span><span class="chip ac rv" data-at="5400">Pausado</span></div>
+    <div class="row"><span>Recordatorio · día 5</span><span class="chip rv" data-at="1800" data-until="5400">Programado</span><span class="chip ac rv" data-at="5400">Pausado</span></div>
+   </div></div>
+   <div class="cd rv" data-at="4200"><div class="ch ac"><span>Respuesta detectada</span><span>Hace 3 h</span></div><div class="cb" style="font-size:12px">
+    <span class="rv" data-at="4200">Camila confirmó su RUT y subió su CV.</span><br>
+    <span class="rv" data-at="5400" style="display:block;margin-top:6px"><span class="chip ok">RUT validado</span> <span class="chip ok">CV recibido</span></span></div></div>
+   <div class="cd rv" data-at="7000"><div class="ch"><span>Agenda</span><span>Entrevista</span></div><div class="cb" style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12px">
+    <span>Jue 12 · 10:30 · Sucursal Concepción</span><span class="chip ok rv" data-at="8600">Confirmada</span></div></div>
+  </div></div>`,
+ log:[[400,"CORREO","envío 1 · enlace seguro para documentos"],[4300,"CORREO","respuesta detectada · secuencia pausada"],[5600,"ORQ","RUT validado · registros unificados por clave exacta"],[8600,"ORQ","entrevista agendada · invitación enviada"]]
+});
+
+S.push({
+ ph:"FIG. 08 · Alta",kick:"§08 · Cierre",title:"Oferta, documentos y alta en el sistema de RR.HH.",
+ desc:"Cuando la persona acepta, el orquestador verifica los documentos y crea el alta en el sistema de RR.HH. La vacante se cierra y los avisos se retiran de los portales.",
+ dur:12000,flow:[5,1,0],
+ html:`<div class="grid2">
+  <div class="cd rv" data-at="200"><div class="ch"><span>Documentos</span><span id="cnt2" class="acc">0 / 4</span></div><div class="cb"><ul class="cl">
+   <li class="rv" data-at="600" data-ck="1400"><span class="bx">✓</span>Cédula de identidad</li>
+   <li class="rv" data-at="900" data-ck="2000"><span class="bx">✓</span>Certificado de estudios</li>
+   <li class="rv" data-at="1200" data-ck="2600"><span class="bx">✓</span>Certificado de antecedentes</li>
+   <li class="rv" data-at="1500" data-ck="3200"><span class="bx">✓</span>Datos bancarios</li>
+  </ul></div></div>
+  <div style="display:flex;flex-direction:column;gap:16px">
+   <div class="cd rv" data-at="4000"><div class="ch"><span>Oferta</span><span>Persona</span></div><div class="cb" style="display:flex;justify-content:space-between;align-items:center;font-size:12px"><span>Jefatura envía oferta · candidata acepta</span><span class="chip ok rv" data-at="5200">Aceptada</span></div></div>
+   <div class="cd rv" data-at="6000"><div class="ch ac"><span>Sistema RR.HH. · alta de colaborador</span><span>API</span></div><div class="cb" style="font-size:12px">
+    <div class="row"><span class="k">Acción</span><span>Crear colaborador</span></div>
+    <div class="row"><span class="k">Estado</span><span class="chip wr rv" data-at="6200" data-until="7400">Enviando</span><span class="chip ok rv" data-at="7400">Alta creada</span></div>
+    <div class="row rv" data-at="8000"><span class="k">Vacantes</span><span>1 de 3 cubierta · búsqueda continúa</span></div></div></div>
+  </div></div>
+  <div class="kpi rv" data-at="9000" style="margin-top:16px">
+   <div><div class="v">1</div><div class="l">Base única</div></div>
+   <div><div class="v">0</div><div class="l">Copias manuales de CV</div></div>
+   <div><div class="v">~6 min</div><div class="l">Intervención por portal asistido</div></div>
+   <div><div class="v">100%</div><div class="l">Decisiones tomadas por personas</div></div>
+  </div>`,
+ count2:{id:"cnt2",steps:[1400,2000,2600,3200],total:4},
+ log:[[1500,"ORQ","documentos verificados · 4 de 4"],[5200,"PERS","oferta aceptada"],[7400,"RR.HH","alta creada vía API · colaborador registrado"],[8200,"ORQ","búsqueda BUS-0417 · 1 de 3 vacantes cubierta"],[10000,"ORQ","ciclo completo · todo trazado en base única"]]
+});
+
+/* ---------- motor ---------- */
+const stepsEl=$("#steps"),canvas=$("#canvas"),logEl=$("#log");
+let cur=0,t=0,playing=true,speed=1,last=0,els=[];
+const fmt=ms=>{const s=Math.floor(ms/1000);return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")};
+const total=S.reduce((a,s)=>a+s.dur,0);
+const before=i=>S.slice(0,i).reduce((a,s)=>a+s.dur,0);
+
+S.forEach((s,i)=>{
+  const li=document.createElement("li");
+  li.innerHTML=`<span class="n">§${String(i+1).padStart(2,"0")}</span><span class="tx">${s.kick.split("·")[1].trim()}</span><i class="pb"></i>`;
+  li.addEventListener("click",()=>go(i));
+  stepsEl.appendChild(li);
+});
+/* log: todas las líneas, visibilidad por tiempo */
+const logLines=[];
+S.forEach((s,i)=>s.log.forEach(l=>{
+  const d=document.createElement("div");d.className="ln";
+  d.innerHTML=`<span class="t">${fmt(before(i)+l[0])}</span> <span class="g">${l[1].padEnd(6," ")}</span> ${l[2]}`;
+  logEl.appendChild(d);logLines.push({d,s:i,at:l[0]});
+}));
+
+function build(i){
+  const s=S[i];cur=i;
+  $("#skick").textContent=s.kick;$("#stitle").textContent=s.title;$("#sdesc").textContent=s.desc;
+  $("#phtitle").textContent=s.ph;$("#stepcount").textContent=String(i+1).padStart(2,"0")+" / "+String(S.length).padStart(2,"0");
+  $("#flow").innerHTML=s.flow.map((n,k)=>(k?'<span class="ar"></span>':'')+`<span class="nd on">${FLOW[n]}</span>`).join("");
+  canvas.innerHTML=s.html;
+  els=[...canvas.querySelectorAll("[data-at]")].map(e=>({e,at:+e.dataset.at,until:e.dataset.until?+e.dataset.until:Infinity,tw:e.dataset.tw,dur:+e.dataset.dur||0,ck:e.dataset.ck?+e.dataset.ck:null}));
+  [...stepsEl.children].forEach((li,k)=>{li.classList.toggle("cur",k===i);li.classList.toggle("done",k<i)});
+}
+function frame(){
+  const s=S[cur];
+  els.forEach(o=>{
+    if(o.tw!==undefined){
+      const p=Math.max(0,Math.min(1,(t-o.at)/o.dur));
+      o.e.textContent=o.tw.slice(0,Math.round(o.tw.length*p));
+      o.e.classList.toggle("cursor",p<1);
+      o.e.classList.toggle("on",t>=o.at);
+    } else {
+      o.e.classList.toggle("on",t>=o.at&&t<o.until);
+      if(o.ck!==null)o.e.classList.toggle("ck",t>=o.ck);
+    }
+  });
+  if(s.count){const n=s.count.steps.filter(x=>t>=x).length;$("#"+s.count.id).textContent=n+s.count.label}
+  if(s.count2){const n=s.count2.steps.filter(x=>t>=x).length;$("#"+s.count2.id).textContent=n+" / "+s.count2.total}
+  if(s.press){const b=canvas.querySelector(s.press.sel);if(b)b.classList.toggle("press",t>=s.press.at)}
+  let lastOn=null;
+  logLines.forEach(l=>{const on=l.s<cur||(l.s===cur&&l.at<=t);l.d.classList.toggle("on",on);if(on)lastOn=l.d});
+  if(lastOn)logEl.scrollTop=logEl.scrollHeight;
+  const g=before(cur)+t;
+  $("#gprog").style.width=(100*g/total)+"%";$("#clock").textContent=fmt(g)+" / "+fmt(total);
+  [...stepsEl.children].forEach((li,k)=>{li.querySelector(".pb").style.width=k<cur?"100%":k===cur?(100*t/s.dur)+"%":"0"});
+}
+function go(i,at){
+  i=Math.max(0,Math.min(S.length-1,i));
+  build(i);t=at||0;frame();
+}
+function tick(ts){
+  if(playing){
+    const dt=Math.min(100,ts-last);t+=dt*speed;
+    if(t>=S[cur].dur){
+      if(cur<S.length-1){go(cur+1)}else{t=S[cur].dur;playing=false;setPlay()}
+    }
+    frame();
+  }
+  last=ts;requestAnimationFrame(tick);
+}
+function setPlay(){$("#bPlay").textContent=playing?"❚❚ Pausa":"▶ Reproducir"}
+$("#bPlay").onclick=()=>{
+  if(!playing&&cur===S.length-1&&t>=S[cur].dur){go(0)}
+  playing=!playing;setPlay();
+};
+$("#bPrev").onclick=()=>go(cur-1);
+$("#bNext").onclick=()=>go(cur+1);
+$("#bRestart").onclick=()=>{go(0);playing=true;setPlay()};
+$("#bSpeed").onclick=()=>{speed=speed===1?1.5:speed===1.5?2:1;$("#bSpeed").textContent=speed+"x"};
+document.addEventListener("keydown",e=>{
+  if(e.code==="Space"){e.preventDefault();$("#bPlay").click()}
+  else if(e.code==="ArrowRight")go(cur+1);
+  else if(e.code==="ArrowLeft")go(cur-1);
+});
+/* parámetros de prueba: ?s=3&t=5000&pause=1 */
+const q=new URLSearchParams(location.search);
+go(q.has("s")?(+q.get("s")-1):0,q.has("t")?+q.get("t"):0);
+if(q.get("pause")==="1"){playing=false}
+setPlay();
+requestAnimationFrame(ts=>{last=ts;tick(ts)});
+})();
+</script>
+</body>
+</html>
