@@ -240,6 +240,18 @@ details.ac .db b{color:var(--ink)}
 @media (max-width:560px){.f4,.ngrid{grid-template-columns:1fr}}
 .grid2>*,.grid3>*{min-width:0}
 .cd pre{white-space:pre-wrap;word-break:break-all}
+
+.gantt{display:grid;grid-template-columns:repeat(13,1fr);border:2px solid var(--ink);background:var(--paper)}
+.gantt .wk{font-size:10px;text-align:center;padding:5px 0;border-bottom:2px solid var(--ink);border-right:1.5px solid var(--mute1);background:var(--paper2);color:var(--ink2)}
+.gantt .wk:nth-child(13){border-right:0}
+.gb{font:inherit;text-align:left;border:0;border-right:2px solid var(--ink);background:var(--paper);color:var(--ink);padding:12px 12px;cursor:pointer;transition:background .15s ease;min-height:92px}
+.gb:last-child{border-right:0}
+.gb:hover{background:var(--paper2)}
+.gb[aria-selected=true]{background:var(--ink);color:var(--paper)}
+.gb .pn{font-size:10px;letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
+.gb b{display:block;font-size:13px;font-weight:600;margin:3px 0}
+.gb span{font-size:11px;opacity:.75}
+@media (max-width:900px){.gantt{grid-template-columns:repeat(13,minmax(34px,1fr));overflow-x:auto}.gb{padding:8px}.gb b{font-size:11px}.gb span{display:none}}
 </style>
 </head>
 <body>
@@ -249,7 +261,7 @@ details.ac .db b{color:var(--ink)}
     <span class="lt">Demo · simulación</span>
   </header>
   <div class="strip">
-    <span>DOC // AIQ-DEMO-001 <span class="m">· REV / A</span></span>
+    <span>DOC // AIQ-DEMO-001 <span class="m">· REV / B</span></span>
     <span><span class="dot">●</span> Datos ficticios <span class="m">· HOJA 01 / FLUJO</span></span>
   </div>
 
@@ -294,6 +306,7 @@ details.ac .db b{color:var(--ink)}
 <section id="tab-dedup" class="tabp"><div class="pane" id="p-dedup"></div></section>
 <section id="tab-llm" class="tabp"><div class="pane" id="p-llm"></div></section>
 <section id="tab-fallas" class="tabp"><div class="pane" id="p-fallas"></div></section>
+<section id="tab-road" class="tabp"><div class="pane" id="p-road"></div></section>
 <section id="tab-faq" class="tabp"><div class="pane" id="p-faq"></div></section>
   <div class="foot"><span>Orquestador · LLM · sistema de RR.HH.</span><span>Recorrido: espacio = pausa · ← → = etapas</span></div>
 </div>
@@ -601,7 +614,7 @@ const head=(k,t,d)=>`<div class="kicker">${k}</div><h2 class="stitle">${t}</h2><
 const num=n=>Math.round(n).toLocaleString("es-CL");
 
 /* ================= navegación ================= */
-const TABS=[["tour","Recorrido","5'"],["arq","Arquitectura","10'"],["funnel","Funnel","10'"],["mail","Correos","10'"],["dedup","Candidato único","5'"],["llm","LLM y datos","10'"],["fallas","Fallas","5'"],["faq","Preguntas","5'"]];
+const TABS=[["tour","Recorrido","5'"],["arq","Arquitectura","10'"],["funnel","Funnel","8'"],["mail","Correos","8'"],["dedup","Candidato único","4'"],["llm","LLM y datos","8'"],["fallas","Fallas","4'"],["road","Roadmap","5'"],["faq","Preguntas","8'"]];
 const nav=$("#tabs");
 TABS.forEach(([id,n,m],i)=>{
   const b=document.createElement("button");b.setAttribute("role","tab");b.dataset.tab=id;
@@ -988,11 +1001,75 @@ const FAQ=[
 ];
 function faq(){
   const p=$("#p-faq");
-  p.innerHTML=head("§08 · Preguntas","Preguntas técnicas frecuentes y lo que se define en Fase 0","Respuestas cortas a lo que suele preguntar un equipo de TI y de RR.HH. Lo que hoy no se sabe se declara y pasa a la Fase 0.")+
+  p.innerHTML=head("§10 · Preguntas","Preguntas técnicas frecuentes y lo que se define en Fase 0","Respuestas cortas a lo que suele preguntar un equipo de TI y de RR.HH. Lo que hoy no se sabe se declara y pasa a la Fase 0.")+
   FAQ.map((f,i)=>`<details class="ac"${i===FAQ.length-1?" open":""}><summary><span>${f[0]}</span></summary><div class="db">${f[1]}</div></details>`).join("");
 }
 
-arq();funnel();mail();dedup();llm();fallas();faq();
+
+/* ================= ROADMAP ================= */
+const PH=[
+ {id:"F0",n:"Fase 0",t:"Diagnóstico y diseño",w:[1,2],sem:"≈ 2 sem",
+  act:["Validar el alcance real de la API de Buk (vacantes, procesos, candidatos), límites y ambiente de pruebas","Matriz por portal: vía de publicación y vía de captura que admite cada uno","Definir con RR.HH. las rúbricas de evaluación por familia de cargos","Evaluación de impacto en datos personales con Legal, Riesgo y TI","Diseño detallado y alcance cerrado"],
+  ent:["Matriz de portales y vías","Documento de diseño y alcance","Rúbricas aprobadas","Evaluación de impacto","Propuesta económica con el alcance cerrado"],
+  flows:"Ninguno en producción: se prueban las conexiones.",
+  need:["Credenciales de API y ambiente de prueba de Buk","Un referente de RR.HH. para las rúbricas","Accesos a las cuentas de los portales","Revisión de Legal, Riesgo y TI"],
+  exit:"Alcance firmado y propuesta económica entregada.",val:"Se sabe qué se puede automatizar en cada portal y qué no, antes de comprometer construcción."},
+ {id:"F1",n:"Fase 1",t:"Publicación y captación",w:[3,6],sem:"≈ 4 sem",
+  act:["Detección de vacantes aprobadas y creación de la búsqueda","Avisos redactados por el LLM, con aprobación humana","Publicación automática donde hay integración y publicación asistida en el resto","Formulario propio con etiqueta de origen y las demás vías de captura","Base única, monitor de vías y tablero base"],
+  ent:["Vacantes detectadas solas","Avisos publicados en los portales acordados","Postulaciones entrando a una base única","Tablero base con postulaciones por vía"],
+  flows:"WF-01, WF-02, WF-03 y WF-08 (monitor y tablero base)",
+  need:["Accesos a portales y tokens de contrato","Aprobación de avisos por un analista"],
+  exit:"Búsquedas reales publicadas de punta a punta y postulaciones llegando a la base única.",val:"Desaparece la publicación manual repetida y las postulaciones dejan de repartirse en cada portal."},
+ {id:"F2",n:"Fase 2",t:"Filtrado y correos",w:[7,10],sem:"≈ 4 sem",
+  act:["Candidato único: validación de RUT y detección de duplicados","Lectura de CVs y puntaje contra la rúbrica, con evidencia citada","Calibración del LLM contra la decisión de analistas con una muestra","Secuencias de correo con dominio autenticado y detección de respuestas","Agenda de entrevistas y subida de documentos"],
+  ent:["Candidato único con vínculos reversibles","Evaluación con motivos y revisión humana","Correos en producción con dominio autenticado","Agenda y documentos por enlace seguro"],
+  flows:"WF-04, WF-05 y WF-06",
+  need:["Dominio o subdominio de correo y configuración DNS","Muestra de búsquedas pasadas para calibrar","Tiempo de analistas para revisar casos"],
+  exit:"Concordancia aceptable con los analistas en la muestra y secuencia de correos funcionando en las búsquedas piloto.",val:"Los analistas reciben una lista ordenada con motivos y dejan de escribir correos de seguimiento."},
+ {id:"F3",n:"Fase 3",t:"Contratación y alta",w:[11,13],sem:"≈ 3 sem",
+  act:["Oferta y firma","Verificación de documentos y alta del colaborador en Buk por API","Tablero completo de métricas y tareas vencidas","Capacitación, manual de operación y traspaso"],
+  ent:["Alta creada en Buk sin reingreso manual","Tablero completo","Manual de operación y capacitación","Soporte durante la puesta en marcha"],
+  flows:"WF-07 y WF-08 completo",
+  need:["Aprobadores de oferta definidos por la jefatura","Revisión de seguridad de TI para la puesta en marcha"],
+  exit:"Alta automática validada y operación traspasada al equipo.",val:"Se cierra el ciclo: de la vacante al alta sin copiar datos entre sistemas."}
+];
+const RISK=[["Portales sin acceso técnico","Conexión directa donde exista, publicación asistida donde no, y captura por enlace propio."],["Buk sin avisos de cambios","Consulta periódica desde el orquestador; límites de la API validados en la Fase 0."],["Correos que caen en spam","Dominio autenticado, calentamiento gradual y alertas de rebote."],["Sesgo en el filtrado","Rúbrica objetiva, sin datos sensibles, decisión humana y revisión periódica."],["Cambios en los portales","Alertas, captura de respaldo por exportación y soporte para ajustar la lectura."],["Accesos o revisiones que se demoran","Se piden en Fase 0 y quedan escritos como responsabilidad de la cooperativa; mueven las fechas si se atrasan."]];
+function road(){
+  const p=$("#p-road");
+  p.innerHTML=head("§09 · Roadmap","Cuatro fases, valor desde la primera","Las duraciones son semanas calendario y estimaciones iniciales; se confirman al cerrar la Fase 0. La propuesta económica se presenta con el alcance cerrado al terminar la Fase 0.")+
+  `<div class="btnrow"><button class="btn sm sel" id="rv4">Ver en 4 fases</button><button class="btn sm" id="rv2">Ver en 2 etapas</button></div>
+  <div class="gantt" id="gt"></div>
+  <div class="cd" id="rdet" style="margin-top:16px"></div>
+  <div class="sub">Riesgos que pueden mover las fechas</div>
+  <div class="tw"><table><thead><tr><th>Riesgo</th><th>Cómo se maneja</th></tr></thead><tbody>${RISK.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td></tr>`).join("")}</tbody></table></div>
+  <div class="sub">Cómo empezamos</div>
+  <div class="f4" style="grid-template-columns:repeat(3,1fr)"><div><h4>01</h4>Reunión de alcance de 60 minutos con RR.HH. y TI.</div><div><h4>02</h4>Acceso a Buk y a los datos de las últimas búsquedas.</div><div><h4>03</h4>Inicio de la Fase 0: diagnóstico y diseño.</div></div>`;
+  let mode=4,sel=0;
+  function groups(){
+    if(mode===4)return PH.map(f=>({n:f.n,t:f.t,w:f.w,sem:f.sem,d:f}));
+    return [{n:"Etapa A",t:"Diagnóstico y diseño",w:[1,2],sem:"≈ 2 sem",d:PH[0]},
+            {n:"Etapa B",t:"Construcción y puesta en marcha",w:[3,13],sem:"≈ 11 sem",d:null}];
+  }
+  function draw(){
+    const g=groups();sel=Math.min(sel,g.length-1);
+    const gt=$("#gt");
+    gt.innerHTML=Array.from({length:13},(_,i)=>`<div class="wk">S${i+1}</div>`).join("")+
+      g.map((x,i)=>`<button class="gb" style="grid-column:${x.w[0]} / ${x.w[1]+1}" data-i="${i}" aria-selected="${i===sel}"><div class="pn">${x.n} · ${x.sem}</div><b>${x.t}</b><span>${x.d?x.d.val:"Fases 1 a 3: publicación, filtrado, correos, contratación y alta."}</span></button>`).join("");
+    gt.querySelectorAll(".gb").forEach(b=>b.onclick=()=>{sel=+b.dataset.i;draw()});
+    const x=g[sel];
+    const L=(a)=>`<ul class="cl" style="margin:0">${a.map(t=>`<li><span class="bx" style="background:var(--ink);border-color:var(--ink)"></span>${t}</li>`).join("")}</ul>`;
+    let body;
+    if(x.d){const d=x.d;body=`<div class="grid2"><div><div class="sub" style="margin-top:0">Actividades</div>${L(d.act)}</div><div><div class="sub" style="margin-top:0">Entregables</div>${L(d.ent)}</div></div>
+      <div class="f4"><div><h4>Flujos del demo</h4>${d.flows}</div><div><h4>Se necesita de Coopeuch</h4>${d.need.join(". ")}.</div><div><h4>Criterio de salida</h4>${d.exit}</div><div><h4>Valor que ya se usa</h4>${d.val}</div></div>`}
+    else body=PH.slice(1).map(d=>`<div class="row" style="align-items:flex-start"><span class="k" style="width:130px">${d.n} · ${d.sem}</span><span style="text-align:left;flex:1"><b>${d.t}</b><br><span class="note">${d.ent.join(" · ")}</span></span></div>`).join("")+`<p class="note" style="margin-top:10px">Cada fase entrega algo que ya se usa. Elige "Ver en 4 fases" para el detalle.</p>`;
+    $("#rdet").innerHTML=`<div class="ch ac"><span>${x.n} · ${x.t}</span><span>Semanas ${x.w[0]}–${x.w[1]}</span></div><div class="cb">${body}</div>`;
+  }
+  $("#rv4").onclick=()=>{mode=4;sel=0;$("#rv4").classList.add("sel");$("#rv2").classList.remove("sel");draw()};
+  $("#rv2").onclick=()=>{mode=2;sel=0;$("#rv2").classList.add("sel");$("#rv4").classList.remove("sel");draw()};
+  draw();
+}
+
+arq();funnel();mail();dedup();llm();fallas();road();faq();
 openTab((location.hash||"#tour").slice(1),true);
 })();
 </script>

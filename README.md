@@ -10,9 +10,10 @@ Página única (`index.html`), sin dependencias ni build. Solo usa Google Fonts 
 5. Candidato único: validador de RUT y puntaje de coincidencia (5')
 6. LLM y datos: qué ve el LLM, tareas, retención, roles y derechos (10')
 7. Fallas: detección, contención, corrección y prevención (5')
-8. Preguntas técnicas y lo que se define en Fase 0 (5')
+8. Roadmap: fases con actividades, entregables, flujos, requisitos y criterio de salida; vista en 4 fases o en 2 etapas (5')
+9. Preguntas técnicas y lo que se define en Fase 0 (5')
 
-Acceso directo a una sección: `index.html#funnel`, `#mail`, `#arq`, `#dedup`, `#llm`, `#fallas`, `#faq`.
+Acceso directo a una sección: `index.html#funnel`, `#mail`, `#arq`, `#dedup`, `#llm`, `#fallas`, `#road`, `#faq`.
 
 ## Publicar en GitHub Pages
 Settings → Pages → Deploy from a branch → `main` / root.
